@@ -1,0 +1,691 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>There Source — thereafter</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&display=swap');
+
+:root {
+  --bg-main: #9b9279;
+  --bg-dark: #867d6a;
+  --bg-diagram: #b5aa90;
+  --card: #c4b99f;
+  --card-light: #d8ceb8;
+  --cream: #ece5d5;
+  --white: #f5f1e8;
+  --text-dark: #2a2520;
+  --text-mid: #4a4235;
+  --text-light: #7a7264;
+  --accent: #e8943a;
+  --accent-dark: #d47e28;
+  --gold: #c9a84c;
+  --border: #a89f8a;
+  --border-dark: #8a8170;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  font-family: 'Noto Sans KR', sans-serif;
+  background: var(--bg-main);
+  color: var(--text-mid);
+  min-height: 100vh;
+}
+
+/* ── Password Screen ── */
+#auth-screen {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  padding: 20px;
+}
+.auth-box {
+  background: var(--white);
+  border-radius: 16px;
+  padding: 48px 40px;
+  max-width: 380px;
+  width: 100%;
+  text-align: center;
+  box-shadow: 0 8px 32px rgba(42,37,32,0.15);
+}
+.auth-box .brand { font-size: 11px; letter-spacing: 3px; color: var(--text-light); text-transform: uppercase; margin-bottom: 8px; }
+.auth-box h1 { font-size: 22px; font-weight: 700; color: var(--text-dark); margin-bottom: 4px; }
+.auth-box .sub { font-size: 13px; color: var(--text-light); margin-bottom: 32px; }
+.auth-box input {
+  width: 100%; padding: 14px 16px; border: 1.5px solid var(--border);
+  border-radius: 10px; font-size: 15px; background: var(--cream);
+  color: var(--text-dark); outline: none; text-align: center;
+  font-family: 'Noto Sans KR', sans-serif;
+}
+.auth-box input:focus { border-color: var(--accent); }
+.auth-box input::placeholder { color: var(--text-light); }
+.auth-box button {
+  width: 100%; padding: 14px; margin-top: 14px; border: none; border-radius: 10px;
+  background: var(--accent); color: var(--white); font-size: 15px; font-weight: 500;
+  cursor: pointer; font-family: 'Noto Sans KR', sans-serif; transition: background 0.2s;
+}
+.auth-box button:hover { background: var(--accent-dark); }
+.auth-error { color: #c0392b; font-size: 13px; margin-top: 10px; display: none; }
+
+/* ── Main App ── */
+#app { display: none; }
+
+.app-header {
+  background: var(--bg-dark);
+  padding: 20px 28px;
+  display: flex; align-items: center; justify-content: space-between;
+  position: sticky; top: 0; z-index: 100;
+  box-shadow: 0 2px 12px rgba(42,37,32,0.12);
+}
+.app-header .logo { display: flex; align-items: baseline; gap: 8px; }
+.app-header .logo-brand { font-size: 11px; letter-spacing: 2.5px; color: var(--card-light); text-transform: uppercase; }
+.app-header .logo-name { font-size: 18px; font-weight: 700; color: var(--cream); }
+.app-header .logo-name span { color: var(--accent); }
+
+.module-tabs {
+  display: flex; gap: 6px;
+}
+.module-tab {
+  padding: 8px 18px; border-radius: 8px; font-size: 13px; font-weight: 500;
+  cursor: pointer; border: 1.5px solid var(--border-dark); color: var(--card-light);
+  background: transparent; transition: all 0.2s; font-family: 'Noto Sans KR', sans-serif;
+}
+.module-tab.active { background: var(--accent); color: var(--white); border-color: var(--accent); }
+.module-tab:hover:not(.active) { background: rgba(236,229,213,0.1); }
+
+/* ── Pattern Grid ── */
+.content { padding: 28px; max-width: 1200px; margin: 0 auto; }
+
+.section-title {
+  font-size: 13px; letter-spacing: 2px; color: var(--card-light);
+  text-transform: uppercase; margin-bottom: 16px;
+  display: flex; align-items: center; gap: 10px;
+}
+.section-title::after {
+  content: ''; flex: 1; height: 1px; background: var(--border);
+}
+
+.pattern-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 16px;
+  margin-bottom: 36px;
+}
+
+.pattern-card {
+  background: var(--white);
+  border-radius: 14px;
+  padding: 24px;
+  cursor: pointer;
+  transition: all 0.25s;
+  border: 1.5px solid transparent;
+  position: relative;
+  overflow: hidden;
+}
+.pattern-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 24px rgba(42,37,32,0.12);
+  border-color: var(--accent);
+}
+.pattern-card .card-num {
+  position: absolute; top: 16px; right: 18px;
+  font-size: 36px; font-weight: 700; color: var(--card-light);
+  line-height: 1; opacity: 0.5;
+}
+.pattern-card .card-module {
+  display: inline-block; padding: 3px 10px; border-radius: 5px;
+  font-size: 11px; font-weight: 500; letter-spacing: 0.5px; margin-bottom: 10px;
+}
+.pattern-card .card-module.e1 { background: var(--gold); color: var(--white); }
+.pattern-card .card-module.e2 { background: var(--accent); color: var(--white); }
+.pattern-card h3 {
+  font-size: 18px; font-weight: 700; color: var(--text-dark); margin-bottom: 4px;
+}
+.pattern-card .card-case {
+  font-size: 13px; color: var(--text-light); margin-bottom: 12px;
+}
+.pattern-card .card-desc {
+  font-size: 13.5px; color: var(--text-mid); line-height: 1.65;
+}
+.pattern-card .card-tags {
+  display: flex; flex-wrap: wrap; gap: 6px; margin-top: 14px;
+}
+.pattern-card .tag {
+  padding: 3px 10px; border-radius: 5px; font-size: 11px;
+  background: var(--cream); color: var(--text-light); border: 1px solid var(--border);
+}
+
+/* ── Detail Modal ── */
+.modal-overlay {
+  position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+  background: rgba(42,37,32,0.6); backdrop-filter: blur(4px);
+  z-index: 200; display: none; align-items: flex-start; justify-content: center;
+  padding: 40px 20px; overflow-y: auto;
+}
+.modal-overlay.show { display: flex; }
+
+.modal {
+  background: var(--white); border-radius: 16px; max-width: 780px; width: 100%;
+  padding: 0; box-shadow: 0 16px 48px rgba(42,37,32,0.25);
+  animation: modalIn 0.3s ease-out;
+  margin-bottom: 40px;
+}
+@keyframes modalIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+
+.modal-header {
+  padding: 28px 32px 20px;
+  border-bottom: 1px solid var(--card-light);
+  display: flex; align-items: flex-start; justify-content: space-between;
+}
+.modal-header-info .modal-module {
+  display: inline-block; padding: 3px 10px; border-radius: 5px;
+  font-size: 11px; font-weight: 500; margin-bottom: 8px;
+}
+.modal-header-info .modal-module.e1 { background: var(--gold); color: var(--white); }
+.modal-header-info .modal-module.e2 { background: var(--accent); color: var(--white); }
+.modal-header-info h2 { font-size: 22px; font-weight: 700; color: var(--text-dark); }
+.modal-header-info .modal-case { font-size: 14px; color: var(--text-light); margin-top: 4px; }
+
+.modal-close {
+  width: 36px; height: 36px; border-radius: 50%; border: none;
+  background: var(--cream); color: var(--text-light); font-size: 18px;
+  cursor: pointer; display: flex; align-items: center; justify-content: center;
+  transition: all 0.2s; flex-shrink: 0; margin-left: 16px;
+}
+.modal-close:hover { background: var(--card); color: var(--text-dark); }
+
+/* ── Diagram Area ── */
+.modal-diagram {
+  background: var(--bg-diagram, #b5aa90);
+  padding: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 260px;
+  border-bottom: 1px solid var(--card-light, #d8ceb8);
+}
+.modal-diagram svg {
+  width: 100%;
+  max-width: 520px;
+  height: auto;
+}
+
+.modal-body { padding: 28px 32px 32px; }
+
+.modal-body .fact-section {
+  margin-bottom: 24px;
+}
+.modal-body .fact-section h4 {
+  font-size: 13px; font-weight: 700; color: var(--accent-dark);
+  letter-spacing: 0.5px; text-transform: uppercase; margin-bottom: 10px;
+  display: flex; align-items: center; gap: 8px;
+}
+.modal-body .fact-section h4::before {
+  content: ''; width: 3px; height: 14px; background: var(--accent); border-radius: 2px;
+}
+.modal-body .fact-content {
+  font-size: 14px; line-height: 1.75; color: var(--text-mid);
+  white-space: pre-line;
+}
+.modal-body .fact-content strong { color: var(--text-dark); font-weight: 600; }
+
+.apply-list {
+  counter-reset: apply;
+}
+.apply-item {
+  counter-increment: apply;
+  padding: 14px 16px 14px 20px;
+  background: var(--cream);
+  border-radius: 10px;
+  margin-bottom: 8px;
+  font-size: 13.5px; line-height: 1.65; color: var(--text-mid);
+  position: relative;
+  border-left: 3px solid var(--accent);
+}
+.apply-item .apply-title {
+  font-weight: 600; color: var(--text-dark); margin-bottom: 2px;
+}
+
+.caution-box {
+  padding: 16px 18px; background: var(--card-light); border-radius: 10px;
+  font-size: 13px; line-height: 1.65; color: var(--text-mid);
+  border-left: 3px solid var(--gold);
+}
+
+/* ── Responsive ── */
+@media (max-width: 768px) {
+  .app-header { flex-direction: column; gap: 12px; align-items: flex-start; }
+  .pattern-grid { grid-template-columns: 1fr; }
+  .modal-header { padding: 20px 20px 16px; }
+  .modal-body { padding: 20px; }
+  .modal-diagram { min-height: 200px; padding: 16px; }
+  .content { padding: 20px 16px; }
+}
+</style>
+</head>
+<body>
+
+<!-- Auth Screen -->
+<div id="auth-screen">
+  <div class="auth-box">
+    <div class="brand">thereafter</div>
+    <h1>There Source</h1>
+    <div class="sub">실행 패턴 & 사례 라이브러리</div>
+    <input type="password" id="pw-input" placeholder="비밀번호" onkeydown="if(event.key==='Enter')checkPw()">
+    <button onclick="checkPw()">접속</button>
+    <div class="auth-error" id="pw-error">비밀번호가 일치하지 않습니다</div>
+  </div>
+</div>
+
+<!-- Main App -->
+<div id="app">
+  <header class="app-header">
+    <div class="logo">
+      <span class="logo-brand">thereafter</span>
+      <span class="logo-name">There <span>Source</span></span>
+    </div>
+    <div class="module-tabs">
+      <button class="module-tab active" onclick="filterModule('all')">전체</button>
+      <button class="module-tab" onclick="filterModule('E1')">E1 공간설계</button>
+      <button class="module-tab" onclick="filterModule('E2')">E2 조닝기획</button>
+    </div>
+  </header>
+
+  <div class="content" id="content"></div>
+</div>
+
+<!-- Detail Modal -->
+<div class="modal-overlay" id="modal" onclick="if(event.target===this)closeModal()">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-header-info">
+        <div class="modal-module" id="modal-module"></div>
+        <h2 id="modal-title"></h2>
+        <div class="modal-case" id="modal-case"></div>
+      </div>
+      <button class="modal-close" onclick="closeModal()">&#x2715;</button>
+    </div>
+    <div class="modal-diagram" id="modal-diagram" style="display:none;"></div>
+    <div class="modal-body" id="modal-body"></div>
+  </div>
+</div>
+
+<script>
+// ── Password ──
+function checkPw() {
+  const input = document.getElementById('pw-input').value;
+  if (input === 'thereafter2026') {
+    document.getElementById('auth-screen').style.display = 'none';
+    document.getElementById('app').style.display = 'block';
+    renderAll();
+  } else {
+    document.getElementById('pw-error').style.display = 'block';
+    document.getElementById('pw-input').value = '';
+    document.getElementById('pw-input').focus();
+  }
+}
+
+// ── Pattern Data ──
+const patterns = [
+  {
+    id: 1, module: 'E1', name: '몰입형', case: 'teamLab Borderless',
+    desc: '경계 없는 단일 세계관. 작품이 벽·바닥·천장을 넘어 연속되며 관객이 세계의 일부가 됨.',
+    tags: ['경험공간','브랜딩','바이럴'],
+    overview: '위치: 도쿄 오다이바 → 아자부다이힐스 이전 (2024)\n면적: 약 10,000㎡\n오픈: 2018.06 (오다이바), 2024.02 (아자부다이힐스)\n운영: teamLab + 모리빌딩\n\n컨셉: "Borderless" — 520개 컴퓨터, 470개 프로젝터로 60개+ 작품이 경계 없이 연결. 작품이 벽·바닥·천장을 넘어 복도까지 흘러나오는 구조. 지도 없이 헤매며 발견하는 경험.',
+    spaces: '• 경계 없는 세계 (메인): 작품이 방을 넘어 이동\n• 운동의 숲: 신체 활동 + 디지털 인터랙션\n• 학교의 숲: 교육형 체험\n• 등불의 숲: 무한 거울 + LED 등불\n• EN Tea House: 차를 따르면 꽃이 피는 디지털 아트 카페',
+    numbers: '• 230만 명/년 방문 (세계 최다 단일 미술관)\n• 160개국 방문객\n• 60개+ 작품 (경계 없이 연결)\n• 520대 컴퓨터, 470대 프로젝터\n• 약 10,000㎡\n• 기네스 "세계에서 가장 많이 방문한 단일 아티스트 미술관"',
+    applies: [
+      { title: '"지도가 없다" = 비선형 동선의 극단', body: '관객에게 길을 알려주지 않음 → 헤매는 것 자체가 경험. 강제 동선의 반대편 극단.' },
+      { title: '"작품이 이동한다" = 콘텐츠가 공간을 지배', body: '공간이 콘텐츠를 담는 것이 아니라, 콘텐츠가 공간의 경계를 무시. 프로젝션 매핑의 가능성.' },
+      { title: '"관객이 작품의 일부"', body: '관객의 움직임이 작품에 영향. 터치/동작 인터랙션으로 개인화된 경험.' },
+      { title: '"230만 명의 증거"', body: '몰입형 공간의 상업적 성공 데이터. 경험 공간의 ROI 논거로 활용 가능.' },
+      { title: '"EN Tea House"', body: '몰입형 공간 내 F&B 연계. 체류시간 연장 + 부대 수익.' }
+    ],
+    caution: '10,000㎡ + 520대 컴퓨터는 초대형 투자. 소규모 적용 시 "하나의 방을 완전 몰입"으로 축소. 핵심은 면적이 아니라 "경계 제거".'
+  },
+  {
+    id: 2, module: 'E1', name: '여정형', case: 'Guinness Storehouse',
+    desc: '7층 순차 상승 여정. 층마다 챕터, 꼭대기에 보상. 경험이 누적되는 내러티브 구조.',
+    tags: ['경험공간','브랜딩','고객교육'],
+    overview: '위치: 더블린 세인트 제임스 게이트 (1904년 양조장)\n면적: 7층, 14,000㎡+\n오픈: 2000년 (리뉴얼 지속)\n\n컨셉: 파인트 잔 모양의 7층 아트리움을 중심으로 1층(원재료)부터 7층(Gravity Bar)까지 순차 상승하며 기네스의 250년 역사를 체험. 꼭대기에서 360도 더블린 전망 + 무료 맥주가 "보상".',
+    spaces: '• 1F 재료: 물, 보리, 홉, 효모 — 오감 체험 (향/촉감)\n• 2F 양조 과정: 거대 양조기 시연\n• 3F 운송 역사: 바지선, 열차 모형\n• 4F 광고 아카이브: 역대 TV CF 상영\n• 5F 기네스 아카데미: 직접 맥주 따르기 체험\n• 6F 레스토랑/바\n• 7F Gravity Bar: 360도 파노라마 + 무료 1파인트',
+    numbers: '• 165만 명/년 방문\n• 아일랜드 최고 관광명소 (20년 연속)\n• 7개 층, 각 층이 하나의 챕터\n• 입장권에 7F 무료 맥주 1잔 포함\n• 파인트 잔 모양 아트리움 (건물 전체 관통)',
+    applies: [
+      { title: '"층 = 챕터" 순차 내러티브', body: '각 층이 이야기의 한 장. 아래에서 위로 갈수록 경험이 축적되어 꼭대기의 보상이 극대화.' },
+      { title: '"보상이 있는 동선"', body: '7층 Gravity Bar가 여정의 목적지. 체험 후 보상이 있으면 이탈률 급감. 매장에서 "끝까지 가면 특별한 것"의 설계.' },
+      { title: '"오감 설계의 증거"', body: '향(홉), 촉감(보리), 미각(맥주)까지 오감을 층별로 자극. 시각 중심 공간에서 벗어나는 방법론.' },
+      { title: '"체험이 곧 교육"', body: '5층에서 직접 맥주 따르기 → 구매/충성 전환. 제품을 "사용해보는" 경험이 판매를 만듦.' },
+      { title: '"건물 자체가 컨셉"', body: '파인트 잔 형태의 아트리움. 건축이 브랜드 메시지를 전달. 공간 형태와 브랜드의 일치.' }
+    ],
+    caution: '7층 규모는 관광 시설. 매장 적용 시 "수직 여정"이 아닌 "수평 여정(입구→안쪽)"으로 변환. 핵심은 "순서가 있는 경험 축적".'
+  },
+  {
+    id: 3, module: 'E1', name: '허브형', case: '츠타야 다이칸야마 T-SITE',
+    desc: '서점 3동이 허브, 전문점이 스포크, 산책로가 연결. 중심으로 돌아오는 자유 동선.',
+    tags: ['판매공간','체류시간','컨설팅'],
+    overview: '위치: 도쿄 시부야구 다이칸야마\n면적: 12,000㎡ 부지, 서점 3동 + 전문점 + 정원\n오픈: 2011.12\n설계: Klein Dytham architecture + 하라 켄야\n\n컨셉: "숲 속의 도서관" — 책을 통해 라이프스타일을 제안. 서점 3동이 중앙 허브이고 주변 전문점이 산책로로 자유롭게 연결.',
+    spaces: '• 중앙 허브: 츠타야 서점 3개 동 (2층, 연결 통로)\n  - 1F: 서적 15만 권, 라이프스타일 큐레이션\n  - 2F: 음반 13만 장, 영화 8만 타이틀, 라운지 Anjin\n• 스타벅스 (서점 내부 입점)\n• T-TRAVEL, 문구 코너\n• 카메라 숍, 애완견 서비스, 자전거 판매점\n• 다이칸야마 가든: 레스토랑, 상업시설',
+    numbers: '• 서적 15만 권, CD 13만 장, 영화 8만 타이틀\n• 영업시간 07:00~26:00\n• 주차 120대, 자전거 200대\n• CCC 2012년 매출 1,097억 엔 (업계 1위)\n• 12,000㎡ 부지',
+    applies: [
+      { title: '"서점이 허브, 전문점이 스포크"', body: '허브형의 교과서. 어떤 업종이든 중심 콘텐츠를 허브로 놓고 주변을 방사하는 구조에 적용 가능.' },
+      { title: '"큐레이션이 동선을 만든다"', body: '장르별이 아닌 라이프스타일별 배치. 책 옆에 관련 음반과 잡화를 두면 자연스러운 이동 발생.' },
+      { title: '"머물게 하는 설계"', body: '카페 내장, 낮은 조도, 우드톤, 자연광. 구매 압박 없이 체류를 유도. 체류시간과 객단가는 비례.' },
+      { title: '"건물 간 여백의 설계"', body: '밀도를 낮추면 체류시간이 늘어남. 복합 공간에서 동선의 숨 쉬는 구간 설계 방법론.' },
+      { title: '"지역 앵커"', body: '한적한 주택가를 쇼핑 명소로 바꾼 사례. 공간이 지역의 성격을 바꿀 수 있다는 근거.' }
+    ],
+    caution: '12,000㎡ 대형 부지의 복합 시설. 소규모 적용 시 "하나의 강한 허브 + 주변 위성 존 + 산책로 연결"을 축소 적용.'
+  },
+  {
+    id: 4, module: 'E1', name: '무대형', case: 'Nike House of Innovation',
+    desc: '1F Arena가 메인 스테이지(60%), 상층부가 점점 전문화. One Floor, One World.',
+    tags: ['판매공간','론칭','브랜딩'],
+    overview: '위치: 뉴욕 맨해튼 5번가 650번지\n면적: 68,000 sq.ft. (약 1,910평), 6층\n오픈: 2018.11 (2025년 "Sport Offense" 리뉴얼)\n\n컨셉: "Living Retail" — One Floor, One World. 각 층이 독자적 세계관. 위로 갈수록 전문화. 모듈러 레이아웃으로 즉시 변경 가능.',
+    spaces: '• B1 Nike Speed Shop: 지역 데이터 기반 큐레이션, 앱 예약 픽업 락커\n• 1F Arena (메인 스테이지): 시즌 스토리텔링, Sport Beacon, 커스터마이징\n• 2F Women\'s & Young Athletes\n• 3F Men\'s Product Zone\n• 4F Nike Sneaker Lab: 세계 최대 풋웨어 컬렉션\n• 5F Nike Expert Studio: 1:1 전문가 상담, 커스터마이징',
+    numbers: '• 68,000 sq.ft., 6층\n• 입구 천장 각도 23.5° = 스우시 로고 각도\n• 계단 = 리사이클 나이키 신발 소재\n• Nike Grind 테라조 바닥 (3가지 변형)\n• Nike 앱이 건축 DNA에 내장',
+    applies: [
+      { title: '"메인 스테이지 + 보조 층"', body: '1F Arena가 에너지 60% 담당, 상층부가 보조. 매장에서 가장 강력한 한 공간이 전체를 주도하는 구조.' },
+      { title: '"One Floor, One World"', body: '각 층이 독자 세계관이지만 전체가 하나. 존별 아이덴티티와 통일감의 균형 방법론.' },
+      { title: '"Living Retail = 모듈러 공간"', body: '타일/가구 재배치로 레이아웃 즉시 변경. 팝업/시즌 변경이 잦은 공간에서 모듈러 집기의 필요성.' },
+      { title: '"디지털이 건물의 DNA"', body: '앱 연동을 설계 단계에서부터 내장. 나중에 덧씌우는 것이 아닌 처음부터 통합.' },
+      { title: '"보이지 않는 것이 경험"', body: '보안 태그 제거, 셀프 체크아웃, 락커 픽업. 구매 마찰을 줄이는 것 자체가 경험 설계.' }
+    ],
+    caution: '68,000 sq.ft. 대형 플래그십. 소규모 적용 시 "메인 존(60%) + 보조 존(40%)"의 면적 비율 원칙을 추출.'
+  },
+  {
+    id: 5, module: 'E1', name: '라운지형', case: '젠틀몬스터 하우스 도산',
+    desc: '1층에 상품 제로. 체류 포인트가 곧 구매 동기. 제품이 조연, 공간이 주연.',
+    tags: ['경험공간','브랜딩','바이럴'],
+    overview: '위치: 서울 강남구 압구정로 46길 50\n면적: 약 1,155㎡ (350평), B1~4F 단독 건물\n오픈: 2021.02 (2024년 2~3층 리뉴얼 \'3.0\')\n운영: 아이아이컴바인드\n\n컨셉: "UNOPENED:FUTURE" — 기능과 효율을 포기하고 감정을 전달하는 데 초점. 3개 브랜드(젠틀몬스터/탬버린즈/누데이크)의 세계관을 하나의 건물에 집약.',
+    spaces: '• B1 누데이크: "TASTE OF MEDITATION", 디저트 전시형 카페\n• 1F 라운지: 상품 없음. 거대 설치물 (Frederik Heyman 협업)\n• 2F 젠틀몬스터 안경: 정제된 감정, 미디어 인스톨레이션\n• 3F 젠틀몬스터 선글라스: 도전적 감정, 키네틱 로봇 오브제\n• 4F 탬버린즈: 블랙/화이트/햇살, 갈대 키네틱 오브제',
+    numbers: '• 350평, 5개 층\n• 평일 하루 최소 600명 방문 (오픈 초기)\n• 아이아이컴바인드 매출: 2015년 572억 → 2019년 2,980억\n• 30개국 400여 매장\n• 하우스 시리즈: 도산→상하이→선전→성수 노웨어(2025)',
+    applies: [
+      { title: '"1층에 상품 없음"', body: '가장 비싼 1층을 순수 경험에 투자. 체류 포인트가 구매를 만든다는 철학. 판매 면적과 체류 면적의 역설.' },
+      { title: '"제품이 조연, 공간이 주연"', body: '상품 밀도를 낮출수록 브랜딩 효과 상승. 프리미엄 공간의 공식.' },
+      { title: '"감정 분리 설계"', body: '안경(정제)과 선글라스(도전)를 층으로 분리. 카테고리별 감정을 다르게 설계하는 방법론.' },
+      { title: '"정기 리뉴얼 = 재방문 동기"', body: '2~3년 주기로 공간 테마 전면 교체(2.0→3.0). 상설 매장에서 한시성 부여.' },
+      { title: '"멀티브랜드 세계관 통합"', body: '3개 브랜드를 하나의 건물에 넣되 층별 독립 아이덴티티 유지.' }
+    ],
+    caution: '고마진 브랜드에 최적화. 박리다매 제품군에는 1층 상품 제로 전략 부적합. "체류 포인트 밀도 > 상품 밀도"의 비율을 마진 구조에 맞게 조정.'
+  },
+  {
+    id: 6, module: 'E1', name: '그리드형', case: 'Apple Store',
+    desc: '균일 테이블 반복, 제품이 주인공. 오픈 플랜, 시야 차단 없음. Town Square.',
+    tags: ['판매공간','매출','컨설팅'],
+    overview: '대표 사례: Apple Fifth Avenue, Union Square, Orchard Road\n글로벌: 500개+ 매장, 26개국\n설계: Foster + Partners (2014~)\n\n컨셉: "Town Square" — 균일한 테이블 위에 제품을 반복 배치. 오픈 플랜, 강제 동선 없음. 제품이 주인공이고 공간은 배경으로 물러남.',
+    spaces: '• The Avenue: 하드웨어 전시 핵심 축, 균일 간격 우드 테이블\n• The Forum: 대형 비디오 월, Today at Apple 세션\n• Genius Grove: 나무 + 벤치, 상담 공간 (바 → 그로브 진화)\n• The Plaza (일부): 매장 외부 공원, 24/7 Wi-Fi, 라이브 공연',
+    numbers: '• Apple Fifth Avenue: 24시간 연중무휴 (세계 유일)\n• Genius Bar 기술자 재직률 90%+\n• 소매 매출: Apple 총 매출의 약 18%\n• Parsons 테이블 (유럽산 지속가능 오크)\n• Nike Grind처럼 재활용 소재 활용',
+    applies: [
+      { title: '"그리드 = 제품이 주인공"', body: '균일한 테이블 반복으로 제품 자체에 시선 집중. 공간이 제품과 경쟁하지 않는 설계. 가전 매장의 기본 레이아웃 원형.' },
+      { title: '"오픈 플랜의 심리적 효과"', body: '시야 차단이 없으면 고객이 매장 전체를 한눈에 파악하고 안심. 자연스러운 탐색 발생.' },
+      { title: '"Genius Bar → Grove 진화"', body: '카운터(장벽)를 나무 아래 벤치(평등)로 전환. 서비스 공간의 물리적 형태가 경험을 바꾸는 사례.' },
+      { title: '"Town Square = 매장의 공공화"', body: 'Forum + Today at Apple로 일상적 방문 동기. 판매 목적 없는 방문이 장기적 매출을 만듦.' },
+      { title: '"글로벌 표준 + 지역 커스텀"', body: '핵심 모듈(Avenue/Forum/Grove)은 전 세계 동일, 건축/소재는 지역성 반영. 표준화와 차별화 균형.' }
+    ],
+    caution: '"소품종 고가 제품"에 최적화. SKU가 많은 매장에는 그리드+존 혼합이 현실적. "제품에 균등한 무대를 주고 공간은 물러남"을 추출 적용.'
+  },
+  {
+    id: 7, module: 'E2', name: '삽입형', case: '사운즈 한남 팝업',
+    desc: '기존 복합공간에 브랜드가 독립 존으로 삽입. 골목길이 발견의 동선.',
+    tags: ['팝업','이벤트','브랜딩'],
+    overview: '위치: 서울 용산구 한남동\n면적: 부지 1,650㎡, 5개 동 복합공간\n오픈: 2018.04\n기획: JOH & Company (조수용 대표) + JAD 박상준 대표\n\n컨셉: "도심 라이프스타일 복합공간" — 핵심 가치를 먼저 구상하고 건물을 맞추는 공간 브랜딩의 선구 사례.',
+    spaces: '• 스틸북스 (4층 서점, 앵커): 층별 주제 큐레이션\n• 콰르텟 (카페/베이커리)\n• 일호식 (퓨전 한식)\n• 이솝, 다이슨 등 라이프스타일 브랜드\n• 갤러리, 꽃집, 레지던스, 오피스',
+    numbers: '• 5개 동 복합 건물\n• JOH → 카카오IX에 약 300억 원 인수\n• 사운즈 시리즈: 한남 → 판교 (6,600㎡ 매입)\n• 인스타 성지 — 어디를 찍어도 사진이 잘 나오는 공간',
+    applies: [
+      { title: '"삽입형의 교과서"', body: '기존 복합공간에 브랜드가 독립 존으로 삽입. 매장 전체를 바꾸지 않고 일부 구역에 팝업/체험존을 넣는 원형.' },
+      { title: '"골목길 = 발견의 동선"', body: '직선 통로가 아닌 구불구불한 골목이 세렌디피티를 만듦. "살짝 숨기면 오히려 찾아가게 됨"의 논리.' },
+      { title: '"앵커 + 위성"', body: '스틸북스 서점이 앵커, 나머지가 위성. 삽입형에서도 방문 동기를 만드는 핵심 앵커가 필수.' },
+      { title: '"가치 먼저, 건물 나중"', body: '핵심 가치를 먼저 정하고 건물을 맞추는 역발상. thereafter의 기획 프로세스와 동일한 철학.' },
+      { title: '"공공성이 트래픽을 만든다"', body: '사유지 일부를 통행로로 개방 → 24시간 유동인구 → 리테일 트래픽 전환.' }
+    ],
+    caution: '사운즈 한남은 "신축 복합공간". 기존 매장 내 삽입과는 물리적 조건이 다름. "독립 세계관 유지 + 기존 트래픽 활용"을 추출 적용.'
+  },
+  {
+    id: 8, module: 'E2', name: '전환형', case: 'Today at Apple',
+    desc: '판매 공간의 기능을 시간대별로 교육/커뮤니티로 전환. Forum이 전환의 물리적 장치.',
+    tags: ['경험공간','고객교육','컨설팅'],
+    overview: '운영: Apple Inc. (2017.05 글로벌 런칭)\n설계: Work & Co + Foster + Partners\n범위: 전 세계 500개+ Apple Store 전 매장\n비용: 모든 세션 무료\n\n컨셉: 판매 공간 → 커뮤니티 학습 허브로 "기능 전환". 매장 리뉴얼 없이 시간대별 기능 전환. "거래에서 경험으로, 경험에서 관계로" 진화.',
+    spaces: '• Forum: 대형 비디오 월 + 좌석 (판매↔교육 전환)\n• Skills 세션: 매장 내 핸즈온 (GarageBand, 사진 편집 등)\n• Walks: 매장 밖 프로그램 (Photo Walk, Sketch Walk)\n• Labs: 90분 심화 세션 (앱 디자인, 코딩)\n• Creative Studios: 소외계층 청년 멘토링',
+    numbers: '• 주 18,000회+ 무료 세션\n• 연간 500만 명+ 참여\n• 2017 칸 라이온즈 티타늄상 + 그랑프리\n• Creative Pro = 리버럴 아츠 전문가 상주\n• 소매 매출: Apple 총 매출의 약 18%',
+    applies: [
+      { title: '"전환형의 교과서"', body: '매장 리뉴얼 없이 시간대별 기능 전환으로 경험 추가. E2 전환형의 원형.' },
+      { title: '"Forum = 전환의 물리적 장치"', body: '비디오 월 + 좌석 세트만 있으면 판매↔교육 전환 가능. 최소 인프라의 참조점.' },
+      { title: '"Creative Pro = 전환 인력 모델"', body: '판매 직원이 아닌 창작 전문가 상주. 직원 역할의 전환이 공간 전환의 핵심.' },
+      { title: '"매장 밖으로 나가기"', body: 'Walk 프로그램은 매장 밖 동네에서 진행. 매장의 경계를 지역으로 확장.' },
+      { title: '"무료가 매출을 만든다"', body: '전체 무료 운영이지만 소매 매출 18% 기여. 체험 프로그램의 ROI 논거.' }
+    ],
+    caution: '전 세계 동일 커리큘럼 + 로컬 커스텀의 이중 구조. 단일 매장에서는 커리큘럼 개발 비용 과다. "기존 공간의 시간대별 기능 전환"과 "전문 인력 배치"를 추출 적용.'
+  },
+  {
+    id: 9, module: 'E2', name: '확장형', case: '스타벅스 리저브 바',
+    desc: '기존 매장에 프리미엄 바를 추가. 5단계 확장 스펙트럼. 병행형의 교훈.',
+    tags: ['판매공간','매출','컨설팅'],
+    overview: '운영: 스타벅스 (글로벌/코리아)\n런칭: 2010년 글로벌, 2014년 한국\n규모: 전 세계 800개+ 리저브 매장, 로스터리 6개\n\n컨셉: 기존 매장에 리저브 전용 바를 추가하여 스페셜티 경험을 확장. 일반 커피 판매는 유지하면서 프리미엄 기능을 덧붙이는 구조.',
+    spaces: '• 5단계 확장 스펙트럼:\n  1단계: 일반 스타벅스\n  2단계: 리저브 바 작게 병행\n  3단계: 리저브 바 별도 층 분리\n  4단계: 리저브 전용 매장 (Reserve Only)\n  5단계: 로스터리 (현장 로스팅+칵테일+베이커리)\n\n• 리저브 도산 (2025): BAR MIXATO 컨셉\n  - 1F 컨시어지 바 + 퍼포먼스 바\n  - 2F 라운지 (카펫, 벽난로, 소파)',
+    numbers: '• 전 세계 800개+ 리저브 매장\n• 한국: 세계 2위 (중국 120개 다음)\n• 리저브 음료 전년비 70%+ 판매 증가\n• 누적 600만 잔+ (한국)\n• 스타벅스 코리아 매출 3조 원+\n• 가격: 일반 4,000~6,000원 vs 리저브 5,000~12,000원',
+    applies: [
+      { title: '"확장형의 교과서"', body: '기존 매장에 새 기능(바)을 추가하여 프리미엄 경험 확장. 매장 전체를 바꾸지 않고 기능을 덧붙이는 원형.' },
+      { title: '"5단계 스펙트럼"', body: '작은 바 추가 → 별도 층 → 전용 매장 → 로스터리. 확장 강도를 점진적으로 높이는 모델.' },
+      { title: '"병행형의 교훈"', body: '일반+리저브 병행 시 고객 간 갈등(바 좌석 공실, 서비스 차등 불만). 확장존은 충분한 독립성이 필수.' },
+      { title: '"바리스타 = 큐레이터"', body: '판매 직원이 아닌 취향 분석·추천 큐레이터. 확장존 인력은 경험 설계자여야 함.' },
+      { title: '"낮과 밤의 기능 전환"', body: '리저브 도산의 커피하우스 → 칵테일바 전환. 확장형 + 전환형의 결합 사례.' }
+    ],
+    caution: '"병행형이 실패하고 전용형으로 전환"한 사실이 핵심 교훈. 기존 매장 내 확장존의 물리적·심리적 분리도 설계에 포함 필요.'
+  }
+];
+
+// ── E1 Diagram SVGs ──
+const diagramSVGs = {
+  1: `<svg viewBox="0 0 480 320">
+  <defs><radialGradient id="immGrad" cx="50%" cy="50%" r="50%"><stop offset="0%" stop-color="#7a6d55" stop-opacity="0.25"/><stop offset="100%" stop-color="#a89f8a" stop-opacity="0"/></radialGradient></defs>
+  <path d="M 60,50 Q 240,20 420,50 Q 450,160 420,270 Q 240,300 60,270 Q 30,160 60,50 Z" fill="url(#immGrad)" stroke="#7a7264" stroke-width="1" stroke-dasharray="6 4"/>
+  <rect x="215" y="278" width="50" height="18" rx="4" fill="#d1c7ae" stroke="#8a7f68" stroke-width="1"/><text x="240" y="290" text-anchor="middle" fill="#2a2520" font-size="8" font-weight="600">ENTER</text>
+  <path d="M 80,140 Q 160,70 240,110 Q 320,150 400,90" fill="none" stroke="#6b5e48" stroke-width="1.5" opacity="0.5" stroke-dasharray="5 4"><animate attributeName="stroke-dashoffset" from="0" to="-18" dur="4s" repeatCount="indefinite"/></path>
+  <path d="M 70,200 Q 150,220 240,180 Q 330,140 410,190" fill="none" stroke="#7a6d55" stroke-width="1.5" opacity="0.5" stroke-dasharray="5 4"><animate attributeName="stroke-dashoffset" from="0" to="-18" dur="5s" repeatCount="indefinite"/></path>
+  <path d="M 120,60 Q 200,160 240,150 Q 280,140 360,240" fill="none" stroke="#5c5040" stroke-width="1.5" opacity="0.5" stroke-dasharray="5 4"><animate attributeName="stroke-dashoffset" from="0" to="-18" dur="4.5s" repeatCount="indefinite"/></path>
+  <path d="M 380,60 Q 300,120 240,140 Q 180,160 100,240" fill="none" stroke="#6b5e48" stroke-width="1.5" opacity="0.5" stroke-dasharray="5 4"><animate attributeName="stroke-dashoffset" from="0" to="-18" dur="5.5s" repeatCount="indefinite"/></path>
+  <circle cx="130" cy="110" r="30" fill="none" stroke="#6b5e48" stroke-width="0.8" opacity="0.3" stroke-dasharray="3 3"/><circle cx="130" cy="110" r="4" fill="#5c5040" opacity="0.6"/>
+  <circle cx="240" cy="85" r="35" fill="none" stroke="#6b5e48" stroke-width="0.8" opacity="0.3" stroke-dasharray="3 3"/><circle cx="240" cy="85" r="4" fill="#5c5040" opacity="0.6"/>
+  <circle cx="340" cy="105" r="26" fill="none" stroke="#6b5e48" stroke-width="0.8" opacity="0.3" stroke-dasharray="3 3"/><circle cx="340" cy="105" r="4" fill="#5c5040" opacity="0.6"/>
+  <circle cx="160" cy="195" r="24" fill="none" stroke="#6b5e48" stroke-width="0.8" opacity="0.3" stroke-dasharray="3 3"/><circle cx="160" cy="195" r="4" fill="#5c5040" opacity="0.6"/>
+  <circle cx="280" cy="200" r="32" fill="none" stroke="#6b5e48" stroke-width="0.8" opacity="0.3" stroke-dasharray="3 3"/><circle cx="280" cy="200" r="4" fill="#5c5040" opacity="0.6"/>
+  <circle cx="240" cy="150" r="20" fill="none" stroke="#6b5e48" stroke-width="0.8" opacity="0.3" stroke-dasharray="3 3"/><circle cx="240" cy="150" r="4" fill="#5c5040" opacity="0.6"/>
+  <circle r="4" fill="#e8943a" opacity="0.9"><animate attributeName="cx" values="200;280;160;320;200" dur="12s" repeatCount="indefinite"/><animate attributeName="cy" values="230;140;110;190;230" dur="12s" repeatCount="indefinite"/></circle>
+  <circle r="3.5" fill="#e8943a" opacity="0.6"><animate attributeName="cx" values="300;180;250;120;300" dur="15s" repeatCount="indefinite"/><animate attributeName="cy" values="100;170;220;130;100" dur="15s" repeatCount="indefinite"/></circle>
+  <text x="240" y="42" text-anchor="middle" fill="#2a2520" font-size="11" font-weight="700" letter-spacing="1">경계 없는 단일 세계관</text>
+  <text x="55" y="268" fill="#4a4235" font-size="8" font-weight="500">정해진 동선 없음</text>
+  <text x="425" y="268" text-anchor="end" fill="#4a4235" font-size="8" font-weight="500">콘텐츠가 공간을 넘나듦</text>
+</svg>`,
+
+  2: `<svg viewBox="0 0 520 320">
+  <defs><marker id="jArr" markerWidth="7" markerHeight="5" refX="6" refY="2.5" orient="auto"><path d="M0,0 L7,2.5 L0,5" fill="#2a2520"/></marker></defs>
+  <rect x="50" y="45" width="420" height="230" rx="10" fill="none" stroke="#8a7f68" stroke-width="0.8"/>
+  <rect x="10" y="140" width="36" height="26" rx="4" fill="#d1c7ae" stroke="#8a7f68" stroke-width="1"/><text x="28" y="157" text-anchor="middle" fill="#2a2520" font-size="7" font-weight="600">ENTER</text>
+  <rect x="62" y="65" width="80" height="190" rx="6" fill="#e0d8c5" opacity="0.5"/><rect x="62" y="65" width="80" height="190" rx="6" fill="none" stroke="#8a7f68" stroke-width="1.5"/>
+  <text x="102" y="150" text-anchor="middle" fill="#2a2520" font-size="11" font-weight="700">ZONE 01</text><text x="102" y="167" text-anchor="middle" fill="#4a4235" font-size="9" font-weight="500">도입</text>
+  <rect x="157" y="65" width="90" height="190" rx="6" fill="#d1c7ae" opacity="0.5"/><rect x="157" y="65" width="90" height="190" rx="6" fill="none" stroke="#7a6d55" stroke-width="1.5"/>
+  <text x="202" y="150" text-anchor="middle" fill="#2a2520" font-size="11" font-weight="700">ZONE 02</text><text x="202" y="167" text-anchor="middle" fill="#4a4235" font-size="9" font-weight="500">전개</text>
+  <rect x="262" y="65" width="90" height="190" rx="6" fill="#c4b99f" opacity="0.5"/><rect x="262" y="65" width="90" height="190" rx="6" fill="none" stroke="#5c5040" stroke-width="1.5"/>
+  <text x="307" y="150" text-anchor="middle" fill="#2a2520" font-size="11" font-weight="700">ZONE 03</text><text x="307" y="167" text-anchor="middle" fill="#4a4235" font-size="9" font-weight="500">클라이맥스</text>
+  <rect x="367" y="65" width="90" height="190" rx="6" fill="#e0d8c5" opacity="0.5"/><rect x="367" y="65" width="90" height="190" rx="6" fill="none" stroke="#8a7f68" stroke-width="1.5"/>
+  <text x="412" y="150" text-anchor="middle" fill="#2a2520" font-size="11" font-weight="700">ZONE 04</text><text x="412" y="167" text-anchor="middle" fill="#4a4235" font-size="9" font-weight="500">마무리</text>
+  <line x1="48" y1="153" x2="59" y2="153" stroke="#2a2520" stroke-width="2" marker-end="url(#jArr)"/>
+  <line x1="144" y1="155" x2="155" y2="155" stroke="#2a2520" stroke-width="2" marker-end="url(#jArr)"/>
+  <line x1="249" y1="155" x2="260" y2="155" stroke="#2a2520" stroke-width="2" marker-end="url(#jArr)"/>
+  <line x1="354" y1="155" x2="365" y2="155" stroke="#2a2520" stroke-width="2" marker-end="url(#jArr)"/>
+  <line x1="459" y1="155" x2="472" y2="155" stroke="#2a2520" stroke-width="2" marker-end="url(#jArr)"/>
+  <rect x="474" y="140" width="36" height="26" rx="4" fill="#d1c7ae" stroke="#8a7f68" stroke-width="1"/><text x="492" y="157" text-anchor="middle" fill="#2a2520" font-size="7" font-weight="600">EXIT</text>
+  <path d="M 102,82 Q 200,55 307,50 Q 412,58 412,82" fill="none" stroke="#e8943a" stroke-width="1.5" stroke-dasharray="4 3" opacity="0.7"/>
+  <text x="260" y="47" text-anchor="middle" fill="#d47e28" font-size="8" font-weight="600">STORY ARC</text>
+  <rect x="62" y="272" width="25" height="7" rx="2" fill="#c4b99f"/><rect x="157" y="270" width="50" height="11" rx="2" fill="#a89f8a"/><rect x="262" y="267" width="90" height="17" rx="2" fill="#7a6d55" opacity="0.6"/>
+  <text x="260" y="298" text-anchor="middle" fill="#4a4235" font-size="8" font-weight="500" letter-spacing="1">경험 축적 →</text>
+</svg>`,
+
+  3: `<svg viewBox="0 0 480 320">
+  <rect x="30" y="25" width="420" height="270" rx="10" fill="none" stroke="#8a7f68" stroke-width="0.8"/>
+  <circle cx="240" cy="155" r="52" fill="#ece5d5" stroke="#e8943a" stroke-width="2"/>
+  <text x="240" y="149" text-anchor="middle" fill="#d47e28" font-size="12" font-weight="700">중앙</text>
+  <text x="240" y="166" text-anchor="middle" fill="#d47e28" font-size="12" font-weight="700">라운지</text>
+  <line x1="240" y1="103" x2="105" y2="65" stroke="#8a7f68" stroke-width="1.2" opacity="0.5" stroke-dasharray="5 3"/>
+  <line x1="240" y1="103" x2="375" y2="65" stroke="#8a7f68" stroke-width="1.2" opacity="0.5" stroke-dasharray="5 3"/>
+  <line x1="240" y1="207" x2="70" y2="220" stroke="#8a7f68" stroke-width="1.2" opacity="0.5" stroke-dasharray="5 3"/>
+  <line x1="240" y1="207" x2="410" y2="220" stroke="#8a7f68" stroke-width="1.2" opacity="0.5" stroke-dasharray="5 3"/>
+  <line x1="240" y1="207" x2="240" y2="260" stroke="#8a7f68" stroke-width="1.2" opacity="0.5" stroke-dasharray="5 3"/>
+  <rect x="69" y="43" width="72" height="44" rx="6" fill="#d1c7ae" stroke="#8a7f68" stroke-width="1.2"/><text x="105" y="62" text-anchor="middle" fill="#2a2520" font-size="10" font-weight="700">존 A</text><text x="105" y="77" text-anchor="middle" fill="#4a4235" font-size="8" font-weight="500">체험</text>
+  <rect x="339" y="43" width="72" height="44" rx="6" fill="#d1c7ae" stroke="#8a7f68" stroke-width="1.2"/><text x="375" y="62" text-anchor="middle" fill="#2a2520" font-size="10" font-weight="700">존 B</text><text x="375" y="77" text-anchor="middle" fill="#4a4235" font-size="8" font-weight="500">전시</text>
+  <rect x="34" y="198" width="72" height="44" rx="6" fill="#d1c7ae" stroke="#8a7f68" stroke-width="1.2"/><text x="70" y="217" text-anchor="middle" fill="#2a2520" font-size="10" font-weight="700">존 C</text><text x="70" y="232" text-anchor="middle" fill="#4a4235" font-size="8" font-weight="500">판매</text>
+  <rect x="374" y="198" width="72" height="44" rx="6" fill="#d1c7ae" stroke="#8a7f68" stroke-width="1.2"/><text x="410" y="217" text-anchor="middle" fill="#2a2520" font-size="10" font-weight="700">존 D</text><text x="410" y="232" text-anchor="middle" fill="#4a4235" font-size="8" font-weight="500">서비스</text>
+  <rect x="204" y="260" width="72" height="44" rx="6" fill="#d1c7ae" stroke="#8a7f68" stroke-width="1.2"/><text x="240" y="279" text-anchor="middle" fill="#2a2520" font-size="10" font-weight="700">존 E</text><text x="240" y="294" text-anchor="middle" fill="#4a4235" font-size="8" font-weight="500">카페</text>
+  <rect x="215" y="28" width="50" height="18" rx="4" fill="#d1c7ae" stroke="#8a7f68" stroke-width="1"/><text x="240" y="40" text-anchor="middle" fill="#2a2520" font-size="7" font-weight="600">ENTER</text>
+</svg>`,
+
+  4: `<svg viewBox="0 0 480 340">
+  <rect x="30" y="15" width="420" height="310" rx="10" fill="none" stroke="#8a7f68" stroke-width="0.8"/>
+  <rect x="120" y="30" width="240" height="130" rx="8" fill="#ece5d5" opacity="0.6" stroke="#e8943a" stroke-width="2"/>
+  <text x="240" y="85" text-anchor="middle" fill="#d47e28" font-size="15" font-weight="700">MAIN STAGE</text>
+  <text x="240" y="105" text-anchor="middle" fill="#4a4235" font-size="9" font-weight="500">이벤트 / 발표 / 퍼포먼스</text>
+  <text x="240" y="140" text-anchor="middle" fill="#e8943a" font-size="10" font-weight="600" opacity="0.5">60%</text>
+  <path d="M 150,175 Q 240,185 330,175" fill="none" stroke="#8a7f68" stroke-width="1" stroke-dasharray="3 3" opacity="0.7"/>
+  <path d="M 158,189 Q 240,201 322,189" fill="none" stroke="#8a7f68" stroke-width="1" stroke-dasharray="3 3" opacity="0.5"/>
+  <path d="M 166,203 Q 240,217 314,203" fill="none" stroke="#8a7f68" stroke-width="1" stroke-dasharray="3 3" opacity="0.3"/>
+  <text x="240" y="228" text-anchor="middle" fill="#4a4235" font-size="8" font-weight="500">AUDIENCE</text>
+  <rect x="36" y="33" width="48" height="44" rx="4" fill="#d1c7ae" stroke="#8a7f68" stroke-width="1.2"/><text x="60" y="59" text-anchor="middle" fill="#2a2520" font-size="9" font-weight="600">체험</text>
+  <rect x="36" y="103" width="48" height="44" rx="4" fill="#d1c7ae" stroke="#8a7f68" stroke-width="1.2"/><text x="60" y="129" text-anchor="middle" fill="#2a2520" font-size="9" font-weight="600">전시</text>
+  <rect x="396" y="33" width="48" height="44" rx="4" fill="#d1c7ae" stroke="#8a7f68" stroke-width="1.2"/><text x="420" y="59" text-anchor="middle" fill="#2a2520" font-size="9" font-weight="600">F&B</text>
+  <rect x="396" y="103" width="48" height="44" rx="4" fill="#d1c7ae" stroke="#8a7f68" stroke-width="1.2"/><text x="420" y="129" text-anchor="middle" fill="#2a2520" font-size="9" font-weight="600">포토</text>
+  <text x="60" y="172" text-anchor="middle" fill="#4a4235" font-size="8" font-weight="500">보조</text>
+  <text x="420" y="172" text-anchor="middle" fill="#4a4235" font-size="8" font-weight="500">보조</text>
+  <text x="240" y="260" text-anchor="middle" fill="#2a2520" font-size="10" font-weight="600">메인 60% + 보조 존 40%</text>
+  <rect x="215" y="275" width="50" height="18" rx="4" fill="#d1c7ae" stroke="#8a7f68" stroke-width="1"/><text x="240" y="287" text-anchor="middle" fill="#2a2520" font-size="7" font-weight="600">ENTER</text>
+</svg>`,
+
+  5: `<svg viewBox="0 0 480 320">
+  <rect x="30" y="25" width="420" height="270" rx="10" fill="none" stroke="#8a7f68" stroke-width="0.8"/>
+  <circle cx="110" cy="80" r="32" fill="#ece5d5" stroke="#8a7f68" stroke-width="1.5"/><text x="110" y="84" text-anchor="middle" fill="#2a2520" font-size="9" font-weight="600">좌석 A</text>
+  <circle cx="110" cy="80" r="32" fill="none" stroke="#e8943a" stroke-width="0.8" opacity="0.2"><animate attributeName="r" values="32;46;32" dur="3s" repeatCount="indefinite"/><animate attributeName="opacity" values="0.3;0;0.3" dur="3s" repeatCount="indefinite"/></circle>
+  <circle cx="310" cy="75" r="36" fill="#ece5d5" stroke="#8a7f68" stroke-width="1.5"/><text x="310" y="79" text-anchor="middle" fill="#2a2520" font-size="9" font-weight="600">좌석 B</text>
+  <circle cx="310" cy="75" r="36" fill="none" stroke="#e8943a" stroke-width="0.8" opacity="0.2"><animate attributeName="r" values="36;50;36" dur="3.4s" repeatCount="indefinite"/><animate attributeName="opacity" values="0.3;0;0.3" dur="3.4s" repeatCount="indefinite"/></circle>
+  <circle cx="185" cy="175" r="28" fill="none" stroke="#7a7264" stroke-width="1" stroke-dasharray="4 3"/><text x="185" y="179" text-anchor="middle" fill="#4a4235" font-size="9" font-weight="600">전시</text>
+  <circle cx="350" cy="200" r="34" fill="none" stroke="#7a7264" stroke-width="1" stroke-dasharray="4 3"/><text x="350" y="204" text-anchor="middle" fill="#4a4235" font-size="9" font-weight="600">체험</text>
+  <circle cx="90" cy="220" r="26" fill="#ece5d5" stroke="#8a7f68" stroke-width="1.5"/><text x="90" y="224" text-anchor="middle" fill="#2a2520" font-size="9" font-weight="600">카페</text>
+  <circle cx="90" cy="220" r="26" fill="none" stroke="#e8943a" stroke-width="0.8" opacity="0.2"><animate attributeName="r" values="26;40;26" dur="3.8s" repeatCount="indefinite"/><animate attributeName="opacity" values="0.3;0;0.3" dur="3.8s" repeatCount="indefinite"/></circle>
+  <circle cx="250" cy="252" r="24" fill="#ece5d5" stroke="#8a7f68" stroke-width="1.5"/><text x="250" y="256" text-anchor="middle" fill="#2a2520" font-size="9" font-weight="600">좌석 C</text>
+  <circle cx="400" cy="120" r="22" fill="none" stroke="#7a7264" stroke-width="1" stroke-dasharray="4 3"/><text x="400" y="124" text-anchor="middle" fill="#4a4235" font-size="9" font-weight="600">갤러리</text>
+  <path d="M 110,80 Q 145,130 185,175" fill="none" stroke="#8a7f68" stroke-width="1" stroke-dasharray="4 4" opacity="0.5"/>
+  <path d="M 185,175 Q 215,215 250,252" fill="none" stroke="#8a7f68" stroke-width="1" stroke-dasharray="4 4" opacity="0.5"/>
+  <path d="M 310,75 Q 340,140 350,200" fill="none" stroke="#8a7f68" stroke-width="1" stroke-dasharray="4 4" opacity="0.5"/>
+  <path d="M 110,80 Q 200,65 310,75" fill="none" stroke="#8a7f68" stroke-width="1" stroke-dasharray="4 4" opacity="0.5"/>
+  <path d="M 90,220 Q 140,200 185,175" fill="none" stroke="#8a7f68" stroke-width="1" stroke-dasharray="4 4" opacity="0.5"/>
+  <path d="M 250,252 Q 300,230 350,200" fill="none" stroke="#8a7f68" stroke-width="1" stroke-dasharray="4 4" opacity="0.5"/>
+  <path d="M 310,75 Q 360,95 400,120" fill="none" stroke="#8a7f68" stroke-width="1" stroke-dasharray="4 4" opacity="0.5"/>
+  <rect x="215" y="28" width="50" height="18" rx="4" fill="#d1c7ae" stroke="#8a7f68" stroke-width="1"/><text x="240" y="40" text-anchor="middle" fill="#2a2520" font-size="7" font-weight="600">ENTER</text>
+  <circle cx="370" cy="268" r="4" fill="#ece5d5" stroke="#8a7f68" stroke-width="0.8"/><text x="380" y="271" fill="#4a4235" font-size="7" font-weight="500">체류 포인트</text>
+  <circle cx="370" cy="282" r="4" fill="none" stroke="#7a7264" stroke-width="0.8" stroke-dasharray="2 1"/><text x="380" y="285" fill="#4a4235" font-size="7" font-weight="500">콘텐츠 존</text>
+</svg>`,
+
+  6: `<svg viewBox="0 0 480 320">
+  <rect x="30" y="25" width="420" height="270" rx="10" fill="none" stroke="#8a7f68" stroke-width="0.8"/>
+  <rect x="65" y="55" width="70" height="48" rx="4" fill="#ece5d5" stroke="#8a7f68" stroke-width="1.2"/><rect x="75" y="63" width="50" height="18" rx="2" fill="#d1c7ae" stroke="#8a7f68" stroke-width="0.6"/><text x="100" y="95" text-anchor="middle" fill="#4a4235" font-size="7" font-weight="500">제품 A</text>
+  <rect x="150" y="55" width="70" height="48" rx="4" fill="#ece5d5" stroke="#8a7f68" stroke-width="1.2"/><rect x="160" y="63" width="50" height="18" rx="2" fill="#d1c7ae" stroke="#8a7f68" stroke-width="0.6"/><text x="185" y="95" text-anchor="middle" fill="#4a4235" font-size="7" font-weight="500">제품 B</text>
+  <rect x="235" y="55" width="70" height="48" rx="4" fill="#ece5d5" stroke="#8a7f68" stroke-width="1.2"/><rect x="245" y="63" width="50" height="18" rx="2" fill="#d1c7ae" stroke="#8a7f68" stroke-width="0.6"/><text x="270" y="95" text-anchor="middle" fill="#4a4235" font-size="7" font-weight="500">제품 C</text>
+  <rect x="320" y="55" width="70" height="48" rx="4" fill="#ece5d5" stroke="#8a7f68" stroke-width="1.2"/><rect x="330" y="63" width="50" height="18" rx="2" fill="#d1c7ae" stroke="#8a7f68" stroke-width="0.6"/><text x="355" y="95" text-anchor="middle" fill="#4a4235" font-size="7" font-weight="500">제품 D</text>
+  <rect x="65" y="125" width="70" height="48" rx="4" fill="#ece5d5" stroke="#8a7f68" stroke-width="1.2"/><rect x="75" y="133" width="50" height="18" rx="2" fill="#d1c7ae" stroke="#8a7f68" stroke-width="0.6"/><text x="100" y="165" text-anchor="middle" fill="#4a4235" font-size="7" font-weight="500">제품 E</text>
+  <rect x="150" y="125" width="70" height="48" rx="4" fill="#ece5d5" stroke="#8a7f68" stroke-width="1.2"/><rect x="160" y="133" width="50" height="18" rx="2" fill="#d1c7ae" stroke="#8a7f68" stroke-width="0.6"/><text x="185" y="165" text-anchor="middle" fill="#4a4235" font-size="7" font-weight="500">제품 F</text>
+  <rect x="235" y="125" width="70" height="48" rx="4" fill="#ece5d5" stroke="#8a7f68" stroke-width="1.2"/><rect x="245" y="133" width="50" height="18" rx="2" fill="#d1c7ae" stroke="#8a7f68" stroke-width="0.6"/><text x="270" y="165" text-anchor="middle" fill="#4a4235" font-size="7" font-weight="500">제품 G</text>
+  <rect x="320" y="125" width="70" height="48" rx="4" fill="#ece5d5" stroke="#8a7f68" stroke-width="1.2"/><rect x="330" y="133" width="50" height="18" rx="2" fill="#d1c7ae" stroke="#8a7f68" stroke-width="0.6"/><text x="355" y="165" text-anchor="middle" fill="#4a4235" font-size="7" font-weight="500">제품 H</text>
+  <rect x="65" y="195" width="70" height="48" rx="4" fill="#ece5d5" stroke="#8a7f68" stroke-width="1.2"/><rect x="75" y="203" width="50" height="18" rx="2" fill="#d1c7ae" stroke="#8a7f68" stroke-width="0.6"/><text x="100" y="235" text-anchor="middle" fill="#4a4235" font-size="7" font-weight="500">제품 I</text>
+  <rect x="150" y="195" width="70" height="48" rx="4" fill="#ece5d5" stroke="#8a7f68" stroke-width="1.2"/><rect x="160" y="203" width="50" height="18" rx="2" fill="#d1c7ae" stroke="#8a7f68" stroke-width="0.6"/><text x="185" y="235" text-anchor="middle" fill="#4a4235" font-size="7" font-weight="500">제품 J</text>
+  <rect x="235" y="195" width="70" height="48" rx="4" fill="#ece5d5" stroke="#8a7f68" stroke-width="1.2"/><rect x="245" y="203" width="50" height="18" rx="2" fill="#d1c7ae" stroke="#8a7f68" stroke-width="0.6"/><text x="270" y="235" text-anchor="middle" fill="#4a4235" font-size="7" font-weight="500">제품 K</text>
+  <rect x="320" y="195" width="70" height="48" rx="4" fill="#ece5d5" stroke="#8a7f68" stroke-width="1.2"/><rect x="330" y="203" width="50" height="18" rx="2" fill="#d1c7ae" stroke="#8a7f68" stroke-width="0.6"/><text x="355" y="235" text-anchor="middle" fill="#4a4235" font-size="7" font-weight="500">제품 L</text>
+  <rect x="405" y="55" width="38" height="210" rx="4" fill="#d1c7ae" stroke="#e8943a" stroke-width="1.5" stroke-dasharray="4 3"/>
+  <text x="424" y="165" text-anchor="middle" fill="#d47e28" font-size="8" font-weight="700" transform="rotate(-90 424 165)">SERVICE / SUPPORT</text>
+  <rect x="215" y="278" width="50" height="18" rx="4" fill="#d1c7ae" stroke="#8a7f68" stroke-width="1"/><text x="240" y="290" text-anchor="middle" fill="#2a2520" font-size="7" font-weight="600">ENTER</text>
+  <text x="230" y="42" text-anchor="middle" fill="#2a2520" font-size="10" font-weight="600">균일 모듈 반복 — 제품이 주인공</text>
+  <text x="424" y="42" text-anchor="middle" fill="#d47e28" font-size="8" font-weight="600">30%</text>
+</svg>`
+};
+
+// ── Render ──
+let currentFilter = 'all';
+
+function filterModule(mod) {
+  currentFilter = mod;
+  document.querySelectorAll('.module-tab').forEach(t => t.classList.remove('active'));
+  event.target.classList.add('active');
+  renderAll();
+}
+
+function renderAll() {
+  const c = document.getElementById('content');
+  const e1 = patterns.filter(p => p.module === 'E1');
+  const e2 = patterns.filter(p => p.module === 'E2');
+  let html = '';
+
+  if (currentFilter === 'all' || currentFilter === 'E1') {
+    html += '<div class="section-title">E1 공간설계 — 6개 패턴</div>';
+    html += '<div class="pattern-grid">' + e1.map(cardHTML).join('') + '</div>';
+  }
+  if (currentFilter === 'all' || currentFilter === 'E2') {
+    html += '<div class="section-title">E2 조닝기획 — 3개 패턴</div>';
+    html += '<div class="pattern-grid">' + e2.map(cardHTML).join('') + '</div>';
+  }
+  c.innerHTML = html;
+}
+
+function cardHTML(p) {
+  return `<div class="pattern-card" onclick="openModal(${p.id})">
+    <span class="card-num">${String(p.id).padStart(2,'0')}</span>
+    <span class="card-module ${p.module.toLowerCase()}">${p.module}</span>
+    <h3>${p.name}</h3>
+    <div class="card-case">${p.case}</div>
+    <div class="card-desc">${p.desc}</div>
+    <div class="card-tags">${p.tags.map(t=>`<span class="tag">${t}</span>`).join('')}</div>
+  </div>`;
+}
+
+// ── Modal ──
+function openModal(id) {
+  const p = patterns.find(x => x.id === id);
+  if (!p) return;
+  document.getElementById('modal-module').className = 'modal-module ' + p.module.toLowerCase();
+  document.getElementById('modal-module').textContent = p.module + (p.module==='E1'?' 공간설계':' 조닝기획');
+  document.getElementById('modal-title').textContent = p.name;
+  document.getElementById('modal-case').textContent = p.case;
+
+  // 다이어그램 표시 (E1만)
+  const diagEl = document.getElementById('modal-diagram');
+  if (diagramSVGs[id]) {
+    diagEl.innerHTML = diagramSVGs[id];
+    diagEl.style.display = 'flex';
+  } else {
+    diagEl.innerHTML = '';
+    diagEl.style.display = 'none';
+  }
+
+  let body = '';
+  body += `<div class="fact-section"><h4>개요</h4><div class="fact-content">${p.overview}</div></div>`;
+  body += `<div class="fact-section"><h4>공간 구성</h4><div class="fact-content">${p.spaces}</div></div>`;
+  body += `<div class="fact-section"><h4>핵심 수치</h4><div class="fact-content">${p.numbers}</div></div>`;
+  body += `<div class="fact-section"><h4>thereafter 적용점</h4><div class="apply-list">`;
+  p.applies.forEach(a => {
+    body += `<div class="apply-item"><div class="apply-title">${a.title}</div>${a.body}</div>`;
+  });
+  body += `</div></div>`;
+  body += `<div class="fact-section"><h4>주의</h4><div class="caution-box">${p.caution}</div></div>`;
+
+  document.getElementById('modal-body').innerHTML = body;
+  document.getElementById('modal').classList.add('show');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeModal() {
+  document.getElementById('modal').classList.remove('show');
+  document.body.style.overflow = '';
+}
+
+document.addEventListener('keydown', e => { if(e.key==='Escape') closeModal(); });
+</script>
+</body>
+</html>
