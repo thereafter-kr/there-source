@@ -96,6 +96,18 @@ body {
 .module-tab.active { background: var(--accent); color: var(--white); border-color: var(--accent); }
 .module-tab:hover:not(.active) { background: rgba(236,229,213,0.1); }
 
+/* ── BTL Filter ── */
+.btl-filter { padding: 0 28px; max-width: 1200px; margin: 16px auto 0; display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.btl-filter-label { font-size: 12px; color: var(--card-light); letter-spacing: 0.5px; white-space: nowrap; }
+.btl-filter-tags { display: flex; gap: 6px; flex-wrap: wrap; }
+.btl-tag {
+  padding: 5px 14px; border-radius: 6px; font-size: 12px; font-weight: 500;
+  cursor: pointer; border: 1.5px solid var(--border-dark); color: var(--card-light);
+  background: transparent; transition: all 0.2s; font-family: 'Noto Sans KR', sans-serif;
+}
+.btl-tag.active { background: var(--gold); color: var(--white); border-color: var(--gold); }
+.btl-tag:hover:not(.active) { background: rgba(236,229,213,0.1); }
+
 /* ── Pattern Grid ── */
 .content { padding: 28px; max-width: 1200px; margin: 0 auto; }
 
@@ -294,6 +306,11 @@ body {
     </div>
   </header>
 
+  <div class="btl-filter">
+    <span class="btl-filter-label">BTL 유형</span>
+    <div class="btl-filter-tags" id="btl-filter-tags"></div>
+  </div>
+
   <div class="content" id="content"></div>
 </div>
 
@@ -320,6 +337,7 @@ function checkPw() {
   if (input === 'thereafter2026') {
     document.getElementById('auth-screen').style.display = 'none';
     document.getElementById('app').style.display = 'block';
+    initBtlFilter();
     renderAll();
   } else {
     document.getElementById('pw-error').style.display = 'block';
@@ -607,6 +625,26 @@ const diagramSVGs = {
 </svg>`
 };
 
+// ── BTL Filter ──
+const BTL_TYPES = ['경험공간', '판매공간', '비상설전시', '이벤트', '팝업', '컨설팅'];
+const activeBtlTypes = new Set();
+
+function initBtlFilter() {
+  const container = document.getElementById('btl-filter-tags');
+  container.innerHTML = BTL_TYPES
+    .map(t => `<span class="btl-tag" data-btl="${t}">${t}</span>`)
+    .join('');
+  container.querySelectorAll('.btl-tag').forEach(tag => {
+    tag.addEventListener('click', () => {
+      const val = tag.dataset.btl;
+      if (activeBtlTypes.has(val)) activeBtlTypes.delete(val);
+      else activeBtlTypes.add(val);
+      tag.classList.toggle('active', activeBtlTypes.has(val));
+      renderAll();
+    });
+  });
+}
+
 // ── Render ──
 let currentFilter = 'all';
 
@@ -619,17 +657,28 @@ function filterModule(mod) {
 
 function renderAll() {
   const c = document.getElementById('content');
-  const e1 = patterns.filter(p => p.module === 'E1');
-  const e2 = patterns.filter(p => p.module === 'E2');
+  let filtered = patterns;
+
+  // BTL 유형 필터
+  if (activeBtlTypes.size > 0) {
+    filtered = filtered.filter(p => p.tags && p.tags.some(t => activeBtlTypes.has(t)));
+  }
+
+  const e1 = filtered.filter(p => p.module === 'E1');
+  const e2 = filtered.filter(p => p.module === 'E2');
   let html = '';
 
   if (currentFilter === 'all' || currentFilter === 'E1') {
-    html += '<div class="section-title">E1 공간설계 — 6개 패턴</div>';
+    html += `<div class="section-title">E1 공간설계 — ${e1.length}개 패턴</div>`;
     html += '<div class="pattern-grid">' + e1.map(cardHTML).join('') + '</div>';
   }
   if (currentFilter === 'all' || currentFilter === 'E2') {
-    html += '<div class="section-title">E2 조닝기획 — 3개 패턴</div>';
+    html += `<div class="section-title">E2 조닝기획 — ${e2.length}개 패턴</div>`;
     html += '<div class="pattern-grid">' + e2.map(cardHTML).join('') + '</div>';
+  }
+
+  if (!html.includes('pattern-card')) {
+    html += '<div style="text-align:center;padding:60px 0;color:var(--card-light);font-size:14px;">해당 유형의 패턴이 없습니다</div>';
   }
   c.innerHTML = html;
 }
